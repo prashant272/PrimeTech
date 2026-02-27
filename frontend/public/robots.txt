@@ -8,4 +8,4 @@ Disallow: /checkout
 Disallow: /my-orders
 Disallow: /order-success
 
-Sitemap: https://biryaniyoyo.com/sitemap.xml
+Sitemap: https://primeimpact.in/sitemap.xml
