@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MapPin, Phone, Mail, Clock, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const ITContact = () => {
     const [openFaq, setOpenFaq] = useState(null);
@@ -25,6 +26,11 @@ const ITContact = () => {
 
     return (
         <div className="min-h-screen pt-24 pb-20 text-white bg-transparent" id="contact">
+            <SEO
+                title="Contact Prime Impact | Hire Expert Developers & IT Consultants"
+                description="Get in touch with Prime Impact Solutions to discuss your next software project. We offer web, mobile, AI, and DevOps services."
+                keywords="Contact Prime Impact, Prime Impact Solutions, Hire developers, IT consultant"
+            />
             {/* Header */}
             <div className="container mx-auto px-6 text-center mb-16">
                 <span className="text-sm font-bold tracking-[0.2em] uppercase block mb-4" style={{ color: '#60a5fa' }}>

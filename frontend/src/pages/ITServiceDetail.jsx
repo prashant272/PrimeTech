@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 import { ArrowLeft, CheckCircle2, Zap, Target, Shield, Layout, Settings, LineChart, ShoppingCart, Brain } from 'lucide-react';
 
 const serviceData = {
@@ -188,6 +189,11 @@ const ITServiceDetail = () => {
 
     return (
         <div className="min-h-screen bg-transparent text-white pt-32 pb-20 overflow-hidden relative">
+            <SEO
+                title={`${service.title} | Prime Impact Solutions`}
+                description={service.fullDesc}
+                keywords={`${service.title}, Prime Impact, Prime Impact Solutions, IT Services`}
+            />
             {/* Background elements */}
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/5 blur-[120px] rounded-full"></div>
             <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-purple-600/5 blur-[120px] rounded-full"></div>

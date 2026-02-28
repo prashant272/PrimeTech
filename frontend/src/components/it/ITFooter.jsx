@@ -16,12 +16,12 @@ const ITFooter = () => {
                     <div className="space-y-8">
                         <Link to="/" className="flex items-center gap-4 group">
                             <div className="relative">
-                                <img src="/logo.png" alt="Prime Impact IT Solutions" className="h-16 w-auto rounded-xl transition-transform duration-500 group-hover:scale-110" />
+                                <img src="/logo.png" alt="Prime Impact Logo" className="h-16 w-auto rounded-xl transition-transform duration-500 group-hover:scale-110" />
                                 <div className="absolute -inset-2 bg-blue-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full"></div>
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-2xl font-black tracking-tighter text-white" style={{ fontFamily: '"Outfit", sans-serif' }}>
-                                    Prime Impact IT Solutions
+                                    Prime Impact Solutions
                                 </span>
                             </div>
                         </Link>
@@ -83,7 +83,7 @@ const ITFooter = () => {
                                     <MapPin size={18} className="text-blue-400" />
                                 </div>
                                 <span className="text-gray-400 text-[15px] leading-relaxed">
-                                    T-1, 3rd Floor, Ruff Toff,<br />New Delhi, India
+                                    T-1, 3rd Floor HL Plaza Dwarka sector 12,<br />New Delhi, India
                                 </span>
                             </li>
                             <li className="flex items-center gap-4 group cursor-pointer">
@@ -92,6 +92,9 @@ const ITFooter = () => {
                                 </div>
                                 <span className="text-gray-400 text-[15px] font-medium group-hover:text-white transition-colors">
                                     +91 9319 9319 06
+                                </span>
+                                <span className="text-gray-400 text-[15px] font-medium group-hover:text-white transition-colors">
+                                    +91 9801 0173 33
                                 </span>
                             </li>
                             <li className="flex items-center gap-4 group cursor-pointer">
@@ -131,7 +134,7 @@ const ITFooter = () => {
                 {/* Footer Bottom */}
                 <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
                     <p className="text-gray-500 text-sm font-medium">
-                        © {new Date().getFullYear()} Prime Impact IT Solutions. All rights reserved.
+                        © {new Date().getFullYear()} Prime Impact Solutions. All rights reserved.
                     </p>
                     <div className="flex gap-10 text-sm font-bold text-gray-500">
                         <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>

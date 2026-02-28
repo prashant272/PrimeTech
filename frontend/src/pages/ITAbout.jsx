@@ -1,9 +1,15 @@
 import React from 'react';
 import { Code2, Award, Globe, Users, Cpu, Target } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const ITAbout = () => {
     return (
         <div className="min-h-screen pt-24 pb-20 text-white bg-transparent">
+            <SEO
+                title="About Prime Impact | Leading IT & Software Development Company"
+                description="Learn about Prime Impact Solutions. We are a trusted IT company building impactful web, mobile, and AI software for global clients."
+                keywords="About Prime Impact, Prime Impact Solutions, Prime Impact IT, Software Company"
+            />
             {/* Hero Section */}
             <div className="relative h-[40vh] mb-20 flex items-center justify-center overflow-hidden">
                 <div
@@ -37,7 +43,7 @@ const ITAbout = () => {
                     </h2>
                     <p className="text-gray-400 text-lg leading-relaxed max-w-3xl mx-auto">
                         Founded with a passion for cutting-edge technology and modern software engineering,{' '}
-                        <strong className="text-white">Prime Impact IT Solutions</strong> is an innovative IT company dedicated to delivering
+                        <strong className="text-white">Prime Impact</strong> is an innovative IT company dedicated to delivering
                         high-quality web applications, mobile apps, cloud infrastructure, and AI solutions. We don't just write code —
                         we engineer business transformation.
                     </p>

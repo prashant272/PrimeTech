@@ -46,7 +46,7 @@ const ITFeatures = () => {
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4" style={{ fontFamily: '"Outfit", sans-serif' }}>
                         Why Choose{' '}
                         <span className="text-blue-gradient">
-                            Prime Impact IT Solutions?
+                            Prime Impact?
                         </span>
                     </h2>
                     <div className="w-24 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent mx-auto opacity-50"></div>

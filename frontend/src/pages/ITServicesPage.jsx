@@ -1,10 +1,16 @@
 import React from 'react';
 import ITServices from '../components/it/ITServices';
+import SEO from '../components/SEO';
 import { ArrowRight } from 'lucide-react';
 
 const ITServicesPage = () => {
     return (
         <div className="min-h-screen pt-24 pb-20 text-white bg-transparent">
+            <SEO
+                title="IT Services | Web, Mobile, Cloud & AI by Prime Impact"
+                description="Explore top-tier IT services by Prime Impact Solutions. We engineer high-performance web applications, mobile apps, and scalable cloud infrastructure."
+                keywords="IT Services, Prime Impact, Prime Impact Solutions, Web Development, Mobile Apps"
+            />
             {/* Header */}
             <ITServices />
 

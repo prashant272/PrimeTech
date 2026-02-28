@@ -20,7 +20,7 @@ const ITBlogPreview = () => {
                 <p className="mb-6">Traditional SaaS tools required users to learn complex interfaces. Today, the interface is disappearing. Agents can now understand intent, navigate complex data structures, and execute tasks on behalf of the user. This shift is reducing churn and increasing the perceived value of software exponentially.</p>
                 <h4 className="text-xl font-bold text-white mb-4">RAG: The Key to Context</h4>
                 <p className="mb-6">Raw LLMs are limited by their training data. By implementing RAG, developers can connect these models to real-time company data, ensuring that every AI interaction is grounded, accurate, and highly relevant to the specific business context.</p>
-                <p>At Prime Impact IT Solutions, we are pioneering these integrations to help startups stay ahead of the curve.</p>
+                <p>At Prime Impact, we are pioneering these integrations to help startups stay ahead of the curve.</p>
             `
         },
         {
@@ -37,7 +37,7 @@ const ITBlogPreview = () => {
                 <p className="mb-6">Container orchestration is the backbone of modern scaling. However, misconfigured clusters can lead to massive costs and outages. We'll explore how to implement auto-scaling groups, horizontal pod autoscalers, and global load balancing to handle traffic spikes effortlessly.</p>
                 <h4 className="text-xl font-bold text-white mb-4">Serverless for the Edge</h4>
                 <p className="mb-6">By moving heavy computations to edge functions, we reduce latency and offload the main infrastructure. This hybrid approach—using Kubernetes for core logic and Serverless for the edge—is the current gold standard for global performance.</p>
-                <p>Infrastructure is the foundation of growth. Ensure yours is built to last with Prime Impact IT Solutions' DevOps expertise.</p>
+                <p>Infrastructure is the foundation of growth. Ensure yours is built to last with Prime Impact's DevOps expertise.</p>
             `
         },
         {
@@ -54,7 +54,7 @@ const ITBlogPreview = () => {
                 <p className="mb-6">PPR allows us to combine the speed of static pages with the power of dynamic content. Imagine a page that loads a static shell instantly while streaming in user-specific data in the background. This is the future of the web.</p>
                 <h4 className="text-xl font-bold text-white mb-4">Optimizing for the LCP</h4>
                 <p className="mb-6">Largest Contentful Paint remains the biggest challenge. We'll look at advanced image optimization, font preloading, and reducing main-thread blocking to ensure your site feels instantaneous on any device.</p>
-                <p>Speed is power. Let Prime Impact IT Solutions optimize your digital presence for maximum impact.</p>
+                <p>Speed is power. Let Prime Impact optimize your digital presence for maximum impact.</p>
             `
         }
     ];
@@ -66,7 +66,7 @@ const ITBlogPreview = () => {
                     <div className="max-w-2xl">
                         <span className="text-blue-400 font-bold tracking-widest uppercase text-sm">Insights</span>
                         <h2 className="text-4xl md:text-5xl font-bold text-white mt-4" style={{ fontFamily: '"Outfit", sans-serif' }}>
-                            Latest from <span className="text-blue-500">Prime Impact IT Solutions Blog</span>:
+                            Latest from <span className="text-blue-500">Prime Impact Blog</span>:
                         </h2>
                     </div>
                     <button className="flex items-center gap-2 px-6 py-3 border border-white/10 rounded-lg text-white font-bold hover:bg-white/5 transition-all">

@@ -5,7 +5,7 @@ const slides = [
     {
         heading: 'Innovative',
         headingAccent: 'IT Solutions',
-        badge: 'Prime Impact IT Solutions',
+        badge: 'Prime Impact',
         tagline: 'Web Development · Mobile Apps · Cloud Services · Digital Transformation',
         cta: { label: '🚀 Get Started', href: '#services' },
         bg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1950&q=80',
