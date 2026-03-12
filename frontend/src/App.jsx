@@ -10,6 +10,8 @@ import ITAbout from './pages/ITAbout';
 import ITContact from './pages/ITContact';
 import ITServicesPage from './pages/ITServicesPage';
 import ITServiceDetail from './pages/ITServiceDetail';
+import ITProductDetail from './pages/ITProductDetail';
+import VisaDetail from './pages/VisaDetail';
 import ITBackground3D from './components/it/ITBackground3D';
 
 function App() {
@@ -28,6 +30,8 @@ function App() {
                   <Route path="/" element={<ITHome />} />
                   <Route path="/services" element={<ITServicesPage />} />
                   <Route path="/services/:serviceId" element={<ITServiceDetail />} />
+                  <Route path="/products/:productId" element={<ITProductDetail />} />
+                  <Route path="/visa/:visaSlug" element={<VisaDetail />} />
                   <Route path="/about" element={<ITAbout />} />
                   <Route path="/contact" element={<ITContact />} />
                 </Routes>

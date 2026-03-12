@@ -50,6 +50,22 @@ const slides = [
         cta: { label: '🔐 Secure Now', href: '#contact' },
         bg: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=1950&q=80',
     },
+    {
+        heading: 'Global Visa',
+        headingAccent: 'Processing',
+        badge: 'UK · Australia · Dubai · Schengen',
+        tagline: 'Fast · Reliable · Expert Documentation · High Success Rate · Express Service',
+        cta: { label: '✈️ Apply Now', href: '/visa/uk-visa' },
+        bg: 'https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?auto=format&fit=crop&w=1950&q=80',
+    },
+    {
+        heading: 'Smart Enterprise',
+        headingAccent: 'Management Systems',
+        badge: 'ERP · CRM · School · Hospital · HRMS',
+        tagline: 'Automation · Efficiency · Scalability · Real-time Analytics · Custom Built',
+        cta: { label: '🚀 Explore Products', href: '#services' },
+        bg: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1950&q=80',
+    }
 ];
 
 const services = [
