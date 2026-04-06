@@ -1,7 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Check, ArrowRight, Star } from 'lucide-react';
+import ITContactModal from './ITContactModal';
 
 const ITPricing = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalData, setModalData] = useState({});
+
+    const handlePlanClick = (plan) => {
+        setModalData({
+            category: 'service',
+            requirement: `Inquiry for ${plan.name} Plan. Features include: ${plan.features.slice(0, 3).join(', ')}...`,
+            serviceType: plan.name === 'Starter' ? 'Web Development' : (plan.name === 'Growth' ? 'App Development' : 'Other')
+        });
+        setIsModalOpen(true);
+    };
+
     const plans = [
         {
             name: "Starter",
@@ -92,13 +105,13 @@ const ITPricing = () => {
                                     <span className="text-5xl font-black text-white">{plan.price}</span>
                                 </div>
 
-                                <p className="text-white/50 text-sm mb-10 leading-relaxed min-h-[3rem] font-medium">
+                                <p className="text-white/50 text-sm mb-10 leading-relaxed min-h-[3rem] font-medium text-left">
                                     {plan.description}
                                 </p>
 
                                 <div className="space-y-5 mb-12">
                                     {plan.features.map((feat, j) => (
-                                        <div key={j} className="flex items-start gap-4 group/item">
+                                        <div key={j} className="flex items-start gap-4 group/item text-left">
                                             <div className="mt-1 w-5 h-5 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 group-hover/item:bg-blue-500 group-hover/item:text-white transition-colors duration-300">
                                                 <Check size={12} className={plan.popular ? 'text-blue-400 group-hover/item:text-white' : 'text-blue-500 group-hover/item:text-white'} />
                                             </div>
@@ -107,7 +120,9 @@ const ITPricing = () => {
                                     ))}
                                 </div>
 
-                                <button className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all flex items-center justify-center gap-3 active:scale-95 shadow-lg
+                                <button 
+                                    onClick={() => handlePlanClick(plan)}
+                                    className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all flex items-center justify-center gap-3 active:scale-95 shadow-lg
                                     ${plan.popular
                                         ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-blue-500/25 hover:brightness-110'
                                         : 'bg-white/5 text-white border border-white/10 hover:bg-white/10 hover:border-blue-500/30'
@@ -120,6 +135,12 @@ const ITPricing = () => {
                     ))}
                 </div>
             </div>
+
+            <ITContactModal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+                initialData={modalData} 
+            />
         </section>
     );
 };

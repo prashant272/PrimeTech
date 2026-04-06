@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowRight, Plane, Globe, ShieldCheck, Clock, CheckCircle2, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ITContactModal from './ITContactModal';
 
 const visas = [
     {
@@ -61,6 +62,18 @@ const visas = [
 
 const ITVisaShowcase = () => {
     const [hovered, setHovered] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalData, setModalData] = useState(null);
+
+    const handleApplyClick = (visa) => {
+        setModalData({
+            category: 'visa',
+            visaDestination: visa.title,
+            visaPersons: 1,
+            requirement: `Visa Inquiry for ${visa.title}`
+        });
+        setIsModalOpen(true);
+    };
 
     return (
         <section className="py-24 relative overflow-hidden">
@@ -122,12 +135,12 @@ const ITVisaShowcase = () => {
                                 </p>
 
                                 <div className="flex items-center justify-between">
-                                    <Link 
-                                        to={`/visa/${visa.id}`}
+                                    <button 
+                                        onClick={() => handleApplyClick(visa)}
                                         className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-xs font-black uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all"
                                     >
                                         Apply Now <ArrowRight size={14} />
-                                    </Link>
+                                    </button>
                                     
                                     <div className="flex gap-2">
                                         <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
@@ -140,6 +153,12 @@ const ITVisaShowcase = () => {
                     ))}
                 </div>
             </div>
+
+            <ITContactModal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+                initialData={modalData}
+            />
         </section>
     );
 };

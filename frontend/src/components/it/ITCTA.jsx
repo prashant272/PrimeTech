@@ -1,7 +1,10 @@
-import React from 'react';
-import { Rocket, Calendar, Phone, CheckCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Rocket, Phone, CheckCircle } from 'lucide-react';
+import ITContactModal from './ITContactModal';
 
 const ITCTA = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     return (
         <section className="py-10">
             <div className="container mx-auto px-6">
@@ -36,24 +39,27 @@ const ITCTA = () => {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
-                            <a href="/contact"
+                            <button
+                                onClick={() => setIsModalOpen(true)}
                                 className="px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl uppercase tracking-widest text-sm hover:scale-105 transition-all shadow-lg hover:shadow-blue-500/40 flex items-center justify-center gap-3">
                                 🚀 Book Free Strategy Call
-                            </a>
-                            <a href="https://calendly.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-10 py-5 bg-white/10 text-white font-bold rounded-xl uppercase tracking-widest text-sm hover:bg-white/15 transition-all border border-white/20 shadow-xl flex items-center justify-center gap-3">
-                                <Calendar size={18} /> Calendly Booking
-                            </a>
+                            </button>
                         </div>
 
-                        <div className="flex flex-col items-center gap-4">
-                            <div className="flex items-center gap-4 px-8 py-4 rounded-2xl bg-white/5 border border-white/10 transition-all hover:bg-white/10 hover:border-blue-500/30 group">
-                                <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                                    <Phone size={20} className="text-blue-400" />
-                                </div>
-                                <span className="text-2xl font-bold text-white tracking-widest font-display">+91 9319 9319 06</span>
+                        <div className="flex flex-col items-center gap-6">
+                            <div className="flex flex-wrap justify-center gap-4 md:gap-8">
+                                <a href="tel:+919319931906" className="flex items-center gap-4 px-8 py-4 rounded-2xl bg-white/5 border border-white/10 transition-all hover:bg-white/10 hover:border-blue-500/30 group">
+                                    <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                                        <Phone size={20} className="text-blue-400" />
+                                    </div>
+                                    <span className="text-xl md:text-2xl font-bold text-white tracking-widest font-display">+91 9319 9319 06</span>
+                                </a>
+                                <a href="tel:+919801017333" className="flex items-center gap-4 px-8 py-4 rounded-2xl bg-white/5 border border-white/10 transition-all hover:bg-white/10 hover:border-purple-500/30 group">
+                                    <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                                        <Phone size={20} className="text-purple-400" />
+                                    </div>
+                                    <span className="text-xl md:text-2xl font-bold text-white tracking-widest font-display">+91 9801 0173 33</span>
+                                </a>
                             </div>
                             <div className="flex items-center gap-2 text-blue-400 text-sm font-bold uppercase tracking-[0.2em] animate-pulse">
                                 <CheckCircle size={14} className="text-green-500" /> Available 24/7 for Consultations
@@ -77,6 +83,12 @@ const ITCTA = () => {
                     </div>
                 </div>
             </div>
+
+            <ITContactModal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+                initialData={null}
+            />
         </section>
     );
 };

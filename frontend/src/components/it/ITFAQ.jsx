@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import { Plus, Minus } from 'lucide-react';
+import ITQuestionModal from './ITQuestionModal';
 
 const ITFAQ = () => {
     const [openIndex, setOpenIndex] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleContactClick = (e) => {
+        e.preventDefault();
+        setIsModalOpen(true);
+    };
 
     const questions = [
         {
@@ -36,17 +43,20 @@ const ITFAQ = () => {
                         <h2 className="text-4xl md:text-5xl font-bold text-white mt-4 mb-8" style={{ fontFamily: '"Outfit", sans-serif', lineHeight: 1.2 }}>
                             Frequently Asked <span className="text-blue-gradient">Questions</span>
                         </h2>
-                        <p className="text-gray-300 text-lg mb-10 leading-relaxed font-medium">
+                        <p className="text-gray-300 text-lg mb-10 leading-relaxed font-medium text-left">
                             Everything you need to know about our process, technology, and support. If you have more questions, feel free to contact us.
                         </p>
 
-                        <div className="p-8 rounded-2xl bg-gradient-to-br from-blue-600/15 via-purple-600/5 to-transparent border border-white/10 shadow-2xl relative overflow-hidden group">
+                        <div className="p-8 rounded-2xl bg-gradient-to-br from-blue-600/15 via-purple-600/5 to-transparent border border-white/10 shadow-2xl relative overflow-hidden group text-left">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl -mr-16 -mt-16 group-hover:bg-blue-500/20 transition-colors"></div>
                             <h4 className="text-xl font-bold text-white mb-2 relative z-10">Still have questions?</h4>
                             <p className="text-gray-400 text-sm mb-6 relative z-10">Can't find the answer you're looking for? Please chat with our friendly team.</p>
-                            <a href="/contact" className="inline-block px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-lg hover:scale-105 transition-all shadow-lg hover:shadow-blue-500/25 relative z-10">
+                            <button 
+                                onClick={handleContactClick}
+                                className="inline-block px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-lg hover:scale-105 transition-all shadow-lg hover:shadow-blue-500/25 relative z-10"
+                            >
                                 Contact Team
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -73,6 +83,11 @@ const ITFAQ = () => {
                     </div>
                 </div>
             </div>
+
+            <ITQuestionModal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+            />
         </section>
     );
 };

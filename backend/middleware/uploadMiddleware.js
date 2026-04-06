@@ -12,7 +12,7 @@ const s3 = new S3Client({
     }
 });
 
-// Configure Multer Storage for S3
+// Configuration for General Image Uploads
 const upload = multer({
     storage: multerS3({
         s3: s3,
@@ -23,7 +23,6 @@ const upload = multer({
         key: function (req, file, cb) {
             const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
             const extension = path.extname(file.originalname);
-            // Store inside 'yo-yo-biryani' folder as requested
             cb(null, `yo-yo-biryani/${file.fieldname}-${uniqueSuffix}${extension}`);
         }
     }),
@@ -42,4 +41,33 @@ const upload = multer({
     }
 });
 
-module.exports = upload;
+// Specific Configuration for Resume/PDF Uploads
+const resumeUpload = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: process.env.AWS_S3_BUCKET,
+        metadata: function (req, file, cb) {
+            cb(null, { fieldName: file.fieldname });
+        },
+        key: function (req, file, cb) {
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            const extension = path.extname(file.originalname);
+            cb(null, `primetech-resumes/${file.fieldname}-${uniqueSuffix}${extension}`);
+        }
+    }),
+    fileFilter: function (req, file, cb) {
+        const filetypes = /pdf|doc|docx/;
+        const mimetypes = /application\/pdf|application\/msword|application\/vnd.openxmlformats-officedocument.wordprocessingml.document/;
+
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = mimetypes.test(file.mimetype);
+
+        if (mimetype && extname) {
+            return cb(null, true);
+        } else {
+            cb(new Error('Error: PDF or Word Documents only!'));
+        }
+    }
+});
+
+module.exports = { upload, resumeUpload };

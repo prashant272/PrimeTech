@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, ArrowRight, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import ITContactModal from './ITContactModal';
 
 const slides = [
     {
@@ -7,7 +9,7 @@ const slides = [
         headingAccent: 'IT Solutions',
         badge: 'Prime Impact',
         tagline: 'Web Development · Mobile Apps · Cloud Services · Digital Transformation',
-        cta: { label: '🚀 Get Started', href: '#services' },
+        cta: { label: '🚀 Get Started', href: '/services' },
         bg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1950&q=80',
     },
     {
@@ -15,7 +17,7 @@ const slides = [
         headingAccent: 'Web Development',
         badge: 'Full Stack · React · Node.js · Next.js',
         tagline: 'Modern · Scalable · Fast · SEO Optimized · Beautiful Designs That Convert',
-        cta: { label: '📱 See Our Work', href: '#services' },
+        cta: { label: '📱 See Our Work', href: '/services/web-development' },
         bg: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1950&q=80',
     },
     {
@@ -23,7 +25,7 @@ const slides = [
         headingAccent: 'Development',
         badge: 'iOS · Android · React Native · Flutter',
         tagline: 'Cross Platform · High Performance · Beautiful UI · App Store Ready',
-        cta: { label: '📲 Build Your App', href: '#contact' },
+        cta: { label: '📲 Build Your App', href: '/services/mobile-development' },
         bg: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=1950&q=80',
     },
     {
@@ -31,7 +33,7 @@ const slides = [
         headingAccent: 'DevOps Solutions',
         badge: 'AWS · Azure · Docker · Kubernetes',
         tagline: 'Auto-Scaling · Zero Downtime · CI/CD Pipelines · 99.9% Uptime SLA',
-        cta: { label: '☁️ Cloud Setup', href: '#contact' },
+        cta: { label: '☁️ Cloud Setup', href: '/services/cloud-devops' },
         bg: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1950&q=80',
     },
     {
@@ -39,7 +41,7 @@ const slides = [
         headingAccent: 'Learning',
         badge: 'AI Solutions · Automation · NLP · Computer Vision',
         tagline: 'Smart Automation · Data Analytics · AI Chatbots · Predictive Systems',
-        cta: { label: '🤖 Explore AI', href: '#services' },
+        cta: { label: '🤖 Explore AI', href: '/services/ai-ml' },
         bg: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?auto=format&fit=crop&w=1950&q=80',
     },
     {
@@ -47,7 +49,7 @@ const slides = [
         headingAccent: '& Compliance',
         badge: 'Security Audits · Penetration Testing · ISO 27001',
         tagline: 'Secure By Design · VAPT · Compliance Ready · Data Protection First',
-        cta: { label: '🔐 Secure Now', href: '#contact' },
+        cta: { label: '🔐 Secure Now', href: '/services/cybersecurity' },
         bg: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=1950&q=80',
     },
     {
@@ -69,7 +71,7 @@ const slides = [
 ];
 
 const services = [
-    { label: 'Web Development', emoji: '💻', href: '#services' },
+    { label: 'Web Development', emoji: '💻', href: '/services/web-development' },
     { label: 'Mobile Apps', emoji: '📱', href: '#services' },
     { label: 'Cloud & DevOps', emoji: '☁️', href: '#services' },
     { label: 'AI Solutions', emoji: '🤖', href: '#services' },
@@ -214,6 +216,8 @@ const ITHero = () => {
     const [current, setCurrent] = useState(0);
     const [visible, setVisible] = useState(true);
     const [scrollY, setScrollY] = useState(0);
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleScroll = () => setScrollY(window.scrollY);
@@ -354,21 +358,34 @@ const ITHero = () => {
 
                         {/* CTA buttons */}
                         <div
-                            className={`flex flex-wrap justify-center lg:justify-start gap-4 md:gap-6 transition-all duration-700 delay-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+                            className={`relative z-30 flex flex-wrap justify-center lg:justify-start gap-4 md:gap-6 transition-all duration-700 delay-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
                         >
-                            <a
-                                href={slide.cta.href}
-                                className="px-8 md:px-12 py-4 md:py-5 font-black uppercase tracking-[0.2em] transition-all transform hover:scale-110 active:scale-95 flex items-center gap-3 shadow-[0_20px_40px_rgba(37,99,235,0.3)] rounded-2xl text-xs md:text-base text-white"
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (slide.cta.href.startsWith('#')) {
+                                        const el = document.getElementById(slide.cta.href.substring(1));
+                                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                                    } else {
+                                        navigate(slide.cta.href);
+                                    }
+                                }}
+                                className="px-8 md:px-12 py-4 md:py-5 font-black uppercase tracking-[0.2em] transition-all transform hover:scale-110 active:scale-95 flex items-center gap-3 shadow-[0_20px_40px_rgba(37,99,235,0.3)] rounded-2xl text-xs md:text-base text-white cursor-pointer"
                                 style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}
                             >
                                 {slide.cta.label}
-                            </a>
-                            <a
-                                href="#contact"
-                                className="px-8 md:px-12 py-4 md:py-5 bg-white/5 border border-white/10 text-white font-black uppercase tracking-[0.2em] hover:bg-white/10 hover:border-white/20 transition-all backdrop-blur-xl rounded-2xl text-xs md:text-base"
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setIsContactModalOpen(true);
+                                }}
+                                className="px-8 md:px-12 py-4 md:py-5 bg-white/10 border border-white/20 text-white font-black uppercase tracking-[0.2em] hover:bg-white/20 hover:border-white/30 transition-all backdrop-blur-xl rounded-2xl text-xs md:text-base cursor-pointer relative z-30"
                             >
                                 📞 CONSULTATION
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -385,6 +402,9 @@ const ITHero = () => {
                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Scroll</span>
                 <ChevronDown size={24} className="text-white" />
             </div>
+
+            {/* Contact Modal */}
+            <ITContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} />
         </section>
     );
 };

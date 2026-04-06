@@ -1,17 +1,67 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import SEO from '../components/SEO';
-import { ArrowLeft, CheckCircle2, ChevronRight } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ChevronRight, Laptop, Activity } from 'lucide-react';
+import api from '../api/axios';
 import { productData } from '../api/productData';
 import { motion } from 'framer-motion';
 
 const ITProductDetail = () => {
     const { productId } = useParams();
-    const product = productData[productId];
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    // Simple session cache to speed up navigation
+    const getCachedProduct = (id) => {
+        try {
+            const cached = sessionStorage.getItem(`product_${id}`);
+            return cached ? JSON.parse(cached) : null;
+        } catch (e) { return null; }
+    };
+
+    const setCachedProduct = (id, data) => {
+        try {
+            sessionStorage.setItem(`product_${id}`, JSON.stringify(data));
+        } catch (e) { }
+    };
 
     useEffect(() => {
+        const fetchProduct = async () => {
+            const cached = getCachedProduct(productId);
+            if (cached) {
+                setProduct(cached);
+                setLoading(false);
+                return;
+            }
+
+            setLoading(true);
+            try {
+                // Try fetching from backend first
+                const response = await api.get(`/content/products/${productId}`);
+                if (response.data.success) {
+                    setProduct(response.data.data);
+                    setCachedProduct(productId, response.data.data);
+                } else {
+                    // Fallback to static data
+                    setProduct(productData[productId]);
+                }
+            } catch (error) {
+                console.warn('Backend fetch failed, using static data');
+                setProduct(productData[productId]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProduct();
         window.scrollTo(0, 0);
     }, [productId]);
+
+    if (loading) return (
+        <div className="min-h-screen bg-[#070b14] flex items-center justify-center">
+            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+    );
 
     if (!product) {
         return (
@@ -95,7 +145,14 @@ const ITProductDetail = () => {
                                 className="absolute inset-0 border border-white/5 rounded-full scale-125"
                             ></motion.div>
 
-                            <product.icon size={220} className="text-blue-400 drop-shadow-[0_0_60px_rgba(59,130,246,0.4)] relative z-10" />
+                            {typeof product.icon === 'string' ? (
+                                <div className="text-blue-400 drop-shadow-[0_0_60px_rgba(59,130,246,0.4)] relative z-10">
+                                    {/* Inline SVG fallback for common icons or handle string names */}
+                                    <Laptop size={220} />
+                                </div>
+                            ) : (
+                                <product.icon size={220} className="text-blue-400 drop-shadow-[0_0_60px_rgba(59,130,246,0.4)] relative z-10" />
+                            )}
                             
                             {/* Glossy Overlay */}
                             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none"></div>
@@ -157,7 +214,7 @@ const ITProductDetail = () => {
                                 className="p-10 rounded-[2.5rem] bg-white/[0.02] border border-white/5 hover:border-blue-500/30 transition-all duration-500 group flex flex-col items-center text-center hover:bg-white/[0.04] hover:-translate-y-2 cursor-pointer"
                             >
                                 <div className="w-20 h-20 rounded-2xl bg-blue-600/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500 shadow-inner">
-                                    <feat.icon size={40} className="text-blue-400" />
+                                    {typeof feat.icon === 'string' ? <CheckCircle2 size={40} className="text-blue-400" /> : <feat.icon size={40} className="text-blue-400" />}
                                 </div>
                                 <h3 className="text-2xl font-bold mb-4 group-hover:text-blue-400 transition-colors uppercase tracking-tight" style={{ fontFamily: '"Outfit", sans-serif' }}>{feat.title}</h3>
                                 <p className="text-white/50 text-sm leading-relaxed font-medium">{feat.desc}</p>
@@ -214,7 +271,7 @@ const ITProductDetail = () => {
                         <div className="relative inline-block">
                              {/* Large Illustration Placeholder Icon */}
                              <div className="text-[200px] text-blue-400/10 drop-shadow-2xl opacity-20 transform -rotate-12">
-                                <product.icon />
+                                {typeof product.icon === 'string' ? <Laptop /> : <product.icon />}
                              </div>
                              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full">
                                 <div className="text-9xl font-black text-white/5 select-none" style={{ fontFamily: '"Outfit", sans-serif' }}>

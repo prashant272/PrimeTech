@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowRight, ExternalLink, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ITContactModal from './ITContactModal';
 
 const services = [
     {
@@ -79,6 +80,20 @@ const services = [
 
 const ITServices = () => {
     const [hovered, setHovered] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalData, setModalData] = useState(null);
+
+    const handleGetQuote = (svc) => {
+        setModalData({
+            category: 'service',
+            requirement: `Inquiry for ${svc.title}`,
+            serviceType: svc.title.includes('Web') ? 'Web Development' : 
+                         svc.title.includes('App') ? 'App Development' :
+                         svc.title.includes('Cloud') ? 'Cloud/DevOps' :
+                         svc.title.includes('SEO') ? 'SEO/Marketing' : 'Other'
+        });
+        setIsModalOpen(true);
+    };
 
     return (
         <section id="services" className="py-8 relative overflow-hidden">
@@ -152,18 +167,25 @@ const ITServices = () => {
                                     >
                                         Learn More <ExternalLink size={14} />
                                     </Link>
-                                    <Link
-                                        to="/contact"
+                                    <button
+                                        onClick={() => handleGetQuote(svc)}
                                         className="flex items-center justify-center gap-2 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-900/20"
                                     >
                                         Get Quote <MessageSquare size={14} />
-                                    </Link>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
+
+            {/* Modal Integration */}
+            <ITContactModal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+                initialData={modalData}
+            />
         </section>
     );
 };

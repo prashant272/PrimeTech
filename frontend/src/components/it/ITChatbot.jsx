@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, X, Send, Bot, User, Laptop, Globe, Briefcase, Sparkles, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import api from '../../api/axios';
 
 const ITChatbot = () => {
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [step, setStep] = useState('welcome'); // welcome, ask_mobile, ask_email, confirmed
-    const [userData, setUserData] = useState({ name: '', mobile: '', email: '' });
+    const [userData, setUserData] = useState({ name: '', mobile: '', email: '', interest: '' });
     const [messages, setMessages] = useState([
         {
             id: 1,
@@ -46,6 +47,7 @@ const ITChatbot = () => {
 
     const handleOptionClick = (option) => {
         if (step !== 'confirmed') {
+            setUserData(prev => ({ ...prev, interest: option.label }));
             addMessage('user', `I am interested in ${option.label}`);
             setIsTyping(true);
             setTimeout(() => {
@@ -91,9 +93,11 @@ const ITChatbot = () => {
             addMessage('bot', `Thank you. And your Email Address to send the proposal?`);
             setStep('ask_email');
         } else if (step === 'ask_email') {
-            setUserData(prev => ({ ...prev, email: input }));
+            const finalData = { ...userData, email: input };
+            setUserData(finalData);
             addMessage('bot', `All set! You're now a verified Prime Impact partner. How can I assist you further?`, true);
             setStep('confirmed');
+            submitLead(finalData);
         } else {
             // Smart routing based on keywords
             if (lowInput.includes('visa')) {
@@ -108,6 +112,21 @@ const ITChatbot = () => {
             } else {
                 addMessage('bot', "Thank you for the message. Our senior consultant will reach out to you within the next hour.");
             }
+        }
+    };
+
+    const submitLead = async (data) => {
+        try {
+            await api.post('/leads', {
+                name: data.name,
+                email: data.email,
+                mobile: data.mobile,
+                interest: data.interest || 'General Inquiry',
+                message: "Lead captured via Professional AI Chatbot"
+            });
+            console.log('Lead submitted to Prime Systems DB');
+        } catch (error) {
+            console.error('Lead submission failed:', error);
         }
     };
 

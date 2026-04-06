@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, X, ChevronDown, Smartphone, Cloud, MessageSquare, AppWindow } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import api from '../../api/axios';
+import ITContactModal from './ITContactModal';
 
 const ITNavbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const navRef = useRef(null);
     const location = useLocation();
 
@@ -38,59 +41,77 @@ const ITNavbar = () => {
         setIsMobileMenuOpen(false);
     }, [location]);
 
+    const [dynamicProducts, setDynamicProducts] = useState({
+        'Mobility Services': [],
+        'Cloud Telephony Services': [],
+        'WhatsApp Services': [],
+        'Application': []
+    });
+    const [dynamicVisas, setDynamicVisas] = useState([]);
+    const [dynamicJobs, setDynamicJobs] = useState([]);
+
+    useEffect(() => {
+        const fetchNavData = async () => {
+            try {
+                // Fetch Products
+                const pRes = await api.get('/content/products');
+                if (pRes.data && pRes.data.data) {
+                    const grouped = pRes.data.data.reduce((acc, p) => {
+                        const cat = p.category || 'Application';
+                        if (!acc[cat]) acc[cat] = [];
+                        acc[cat].push({ name: p.title, slug: p.slug });
+                        return acc;
+                    }, {
+                        'Mobility Services': [],
+                        'Cloud Telephony Services': [],
+                        'WhatsApp Services': [],
+                        'Application': []
+                    });
+                    setDynamicProducts(grouped);
+                }
+
+                // Fetch Visas
+                const vRes = await api.get('/content/visas');
+                if (vRes.data && vRes.data.data) {
+                    setDynamicVisas(vRes.data.data.map(v => ({ name: v.title, slug: v.slug })));
+                }
+
+                // Fetch Jobs
+                const jRes = await api.get('/content/jobs');
+                if (jRes.data && jRes.data.data) {
+                    setDynamicJobs(jRes.data.data.filter(j => j.active).map(j => ({ name: j.title, id: j._id })));
+                }
+            } catch (err) {
+                console.error('Navbar data fetch failed:', err);
+            }
+        };
+        fetchNavData();
+    }, []);
+
     const productCategories = [
         {
             title: 'Mobility Services',
             icon: <Smartphone className="text-blue-400" size={20} />,
-            items: [
-                { name: 'Promotional SMS', slug: 'promotional-sms' },
-                { name: 'Transactional SMS', slug: 'transactional-sms' },
-                { name: 'Otp SMS', slug: 'otp-sms' },
-                { name: 'RCS Messaging Services', slug: 'rcs-messaging' },
-                { name: 'SMS Campaign', slug: 'sms-campaign' },
-                { name: 'Election Campaign', slug: 'election-campaign' },
-                { name: 'Real-Estate Campaign', slug: 'real-estate-campaign' }
-            ]
+            items: dynamicProducts['Mobility Services']
         },
         {
             title: 'Cloud Telephony Services',
             icon: <Cloud className="text-purple-400" size={20} />,
-            items: [
-                { name: 'Voice Broadcast (OBD)', slug: 'voice-broadcast' },
-                { name: 'Voice DTMF', slug: 'voice-dtmf' },
-                { name: 'Click to Call', slug: 'click-to-call' },
-                { name: 'OTP on Call', slug: 'otp-on-call' },
-                { name: 'IVR/ Tollfree', slug: 'ivr-tollfree' },
-                { name: 'Missed Call Alert', slug: 'missed-call-alert' },
-                { name: 'Long/Short Code', slug: 'long-short-code' }
-            ]
+            items: dynamicProducts['Cloud Telephony Services']
         },
         {
             title: 'WhatsApp Services',
             icon: <MessageSquare className="text-green-400" size={20} />,
-            items: [
-                { name: 'WhatsApp Official API', slug: 'whatsapp-api' },
-                { name: 'WhatsApp Business SMS', slug: 'whatsapp-business' },
-                { name: 'WhatsApp Chatbot', slug: 'whatsapp-chatbot' },
-                { name: 'WhatsApp Marketing', slug: 'whatsapp-marketing' }
-            ]
+            items: dynamicProducts['WhatsApp Services']
         },
         {
             title: 'Application',
             icon: <AppWindow className="text-blue-500" size={20} />,
-            items: [
-                { name: 'School Management', slug: 'school-management' },
-                { name: 'Hospital Management', slug: 'hospital-management' },
-                { name: 'HR Management', slug: 'hr-management' },
-                { name: 'GPS Tracking System', slug: 'gps-tracking' },
-                { name: 'Transport Management', slug: 'transport-management' },
-                { name: 'Gym Management', slug: 'gym-management' },
-                { name: 'E-commerce Platform', slug: 'ecommerce-platform' }
-            ]
+            items: dynamicProducts['Application']
         }
     ];
 
-    const visaCategories = [
+    const visaCategories = dynamicVisas.length > 0 ? dynamicVisas : [
         { name: 'Australia Visa', slug: 'australia-visa' },
         { name: 'Malaysia Visa', slug: 'malaysia-visa' },
         { name: 'Dubai Visa', slug: 'dubai-visa' },
@@ -107,6 +128,8 @@ const ITNavbar = () => {
         { label: 'Services', to: '/services' },
         { label: 'Product', type: 'dropdown' },
         { label: 'Visa', type: 'dropdown' },
+        { label: 'Blog', to: '/blog' },
+        { label: 'Careers', type: 'dropdown' },
         { label: 'Contact', to: '/contact' },
     ];
 
@@ -132,7 +155,7 @@ const ITNavbar = () => {
                 </Link>
 
                 {/* Desktop Menu */}
-                <div className="hidden md:flex items-center space-x-10">
+                <div className="hidden md:flex items-center space-x-6">
                     {navLinks.map(link => (
                         <div 
                             key={link.label} 
@@ -227,17 +250,53 @@ const ITNavbar = () => {
                                     </div>
                                 </div>
                             )}
+
+                            {/* Simple Dropdown for Careers (Jobs) */}
+                            {link.label === 'Careers' && activeDropdown === 'Careers' && (
+                                <div className="absolute top-full left-0 pt-4 w-64">
+                                    <div className="p-4 rounded-xl border border-white/10 shadow-2xl overflow-hidden"
+                                        style={{ 
+                                            background: 'rgba(7,11,20,0.95)', 
+                                            backdropFilter: 'blur(20px)',
+                                            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)'
+                                        }}>
+                                        <div className="px-3 pb-2 mb-2 border-b border-white/5">
+                                            <Link to="/careers" onClick={() => setActiveDropdown(null)} className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 hover:text-white transition-colors">
+                                                View All Openings
+                                            </Link>
+                                        </div>
+                                        <ul className="flex flex-col gap-1 max-h-64 overflow-y-auto custom-scrollbar">
+                                            {dynamicJobs.length > 0 ? (
+                                                dynamicJobs.map((job, i) => (
+                                                    <li key={i}>
+                                                        <Link 
+                                                            to={`/careers`} 
+                                                            onClick={() => setActiveDropdown(null)}
+                                                            className="text-[12px] text-white hover:text-blue-400 transition-all duration-300 block py-2 px-3 rounded-lg hover:bg-white/5 font-medium"
+                                                        >
+                                                            {job.name}
+                                                        </Link>
+                                                    </li>
+                                                ))
+                                            ) : (
+                                                <li className="px-3 py-2 text-[11px] text-white/40 italic">No active openings</li>
+                                            )}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
 
                 {/* CTA */}
                 <div className="hidden md:block">
-                    <Link to="/contact"
-                        className="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-[0.2em] text-white transition-all hover:scale-105 active:scale-95"
+                    <button 
+                        onClick={() => setIsContactModalOpen(true)}
+                        className="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-[0.2em] text-white transition-all hover:scale-105 active:scale-95 cursor-pointer"
                         style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)', boxShadow: '0 8px 25px -5px rgba(37,99,235,0.4)' }}>
                         Get Free Quote
-                    </Link>
+                    </button>
                 </div>
 
                 {/* Mobile Menu Button */}
@@ -286,6 +345,22 @@ const ITNavbar = () => {
                                             ))}
                                         </div>
                                     )}
+                                    {activeDropdown === link.label && link.label === 'Careers' && (
+                                        <div className="mt-4 flex flex-col items-center space-y-2 w-full bg-white/5 py-4 rounded-xl">
+                                            <Link to="/careers" onClick={() => setIsMobileMenuOpen(false)} className="text-xs text-blue-400 font-bold uppercase tracking-widest mb-2">
+                                                All Openings
+                                            </Link>
+                                            {dynamicJobs.length > 0 ? (
+                                                dynamicJobs.map((job, i) => (
+                                                    <Link key={i} to={`/careers`} onClick={() => setIsMobileMenuOpen(false)} className="text-sm text-white py-1">
+                                                        {job.name}
+                                                    </Link>
+                                                ))
+                                            ) : (
+                                                <span className="text-xs text-white/20 italic">No openings</span>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <Link to={link.to}
@@ -297,14 +372,23 @@ const ITNavbar = () => {
                             )}
                         </div>
                     ))}
-                    <Link to="/contact"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="px-10 py-4 rounded-xl font-black uppercase tracking-[0.2em] text-white"
+                    <button 
+                        onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            setIsContactModalOpen(true);
+                        }}
+                        className="px-10 py-4 rounded-xl font-black uppercase tracking-[0.2em] text-white cursor-pointer"
                         style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}>
                         Get Free Quote
-                    </Link>
+                    </button>
                 </div>
             )}
+
+            {/* Global Contact Modal */}
+            <ITContactModal 
+                isOpen={isContactModalOpen} 
+                onClose={() => setIsContactModalOpen(false)} 
+            />
         </nav>
     );
 };

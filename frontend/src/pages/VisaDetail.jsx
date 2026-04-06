@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import api from '../api/axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Clock, 
@@ -14,21 +15,62 @@ import {
     Calendar,
     ChevronRight,
     HelpCircle,
-    Info
+    Info,
+    Briefcase,
+    HeartPulse,
+    Map,
+    Lock
 } from 'lucide-react';
-import { visaData } from '../api/visaData';
+const iconMap = {
+    Globe: Globe,
+    ShieldCheck: ShieldCheck,
+    Calendar: Calendar,
+    Clock: Clock,
+    CheckCircle2: CheckCircle2,
+    FileText: FileText,
+    Users: Users,
+    Zap: Zap,
+    Briefcase: Briefcase,
+    Plane: Plane,
+    HeartPulse: HeartPulse,
+    Map: Map,
+    Lock: Lock
+};
 
 const VisaDetail = () => {
     const { visaSlug } = useParams();
-    const visa = visaData[visaSlug];
-    const [scrollY, setScrollY] = React.useState(0);
+    const [visa, setVisa] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [scrollY, setScrollY] = useState(0);
 
     useEffect(() => {
+        const fetchContent = async () => {
+            setLoading(true);
+            try {
+                const response = await api.get(`/content/visas/${visaSlug}`);
+                if (response.data.success) {
+                    setVisa(response.data.data);
+                }
+            } catch (error) {
+                console.error('Error fetching visa details:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchContent();
+        
         const handleScroll = () => setScrollY(window.scrollY);
         window.addEventListener('scroll', handleScroll);
         window.scrollTo(0, 0);
         return () => window.removeEventListener('scroll', handleScroll);
     }, [visaSlug]);
+
+    if (loading) return (
+        <div className="min-h-screen bg-[#0a1120] flex items-center justify-center">
+            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+    );
 
     if (!visa) {
         return (
@@ -266,7 +308,7 @@ const VisaDetail = () => {
                 <div className="container mx-auto px-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {visa.features.map((feature, i) => {
-                            const Icon = feature.icon;
+                            const Icon = iconMap[feature.icon] || Info;
                             return (
                                 <motion.div 
                                     key={i}
