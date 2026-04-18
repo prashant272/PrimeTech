@@ -53,8 +53,10 @@ const ITContact = () => {
                     {/* Contact Details Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {[
-                            { icon: MapPin, title: 'Our Office', info: 'T-1, 3rd Floor, Ruff Toff\nNew Delhi, India' },
-                            { icon: Phone, title: 'Call / WhatsApp', info: '9319 9319 06' },
+                            { icon: MapPin, title: 'India Office', info: 'T-1, 3rd Floor, HL Plaza\nDwarka Sector 12, New Delhi' },
+                            { icon: MapPin, title: 'UAE Office', info: 'Near Lucky Roundabout, 3912\nAjman, U.A.E.' },
+                            { icon: Phone, title: 'India Contact', info: '+91 9319 9319 06\n+91 9801 0173 33' },
+                            { icon: Phone, title: 'UAE Contact', info: '+971 6 742 5385\n+971 58 512 2033' },
                             { icon: Mail, title: 'Email Us', info: 'hello@primeimpact.in' },
                             { icon: Clock, title: 'Working Hours', info: 'Mon – Sat\n10:00 AM – 7:00 PM' },
                         ].map((card, i) => (

@@ -25,7 +25,8 @@ const ITChatbot = () => {
     const initialOptions = [
         { label: 'IT Services', icon: <Laptop size={14} />, route: '/services' },
         { label: 'Management Products', icon: <Briefcase size={14} />, route: '/' },
-        { label: 'Visa Assistance', icon: <Globe size={14} />, route: '/visa/uk-visa' }
+        { label: 'Visa Assistance', icon: <Globe size={14} />, route: '/visa/uk-visa' },
+        { label: 'WhatsApp Expert', icon: <MessageSquare size={14} />, type: 'whatsapp' }
     ];
 
     useEffect(() => {
@@ -46,6 +47,15 @@ const ITChatbot = () => {
     };
 
     const handleOptionClick = (option) => {
+        if (option.type === 'whatsapp') {
+            addMessage('user', 'I want to chat on WhatsApp');
+            addMessage('bot', 'Connecting you to our WhatsApp expert...');
+            setTimeout(() => {
+                window.open('https://wa.me/919801017333', '_blank');
+            }, 1000);
+            return;
+        }
+
         if (step !== 'confirmed') {
             setUserData(prev => ({ ...prev, interest: option.label }));
             addMessage('user', `I am interested in ${option.label}`);
@@ -145,7 +155,7 @@ const ITChatbot = () => {
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-blue-500/20 relative">
                                     <Bot className="text-white" size={24} />
-                                    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-[#0a1120] rounded-full animate-pulse"></span>
+                                    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-[#0a1120] rounded-full"></span>
                                 </div>
                                 <div className="flex flex-col">
                                     <h4 className="text-white font-black text-sm tracking-tight">Prime AI Pro</h4>
@@ -266,7 +276,6 @@ const ITChatbot = () => {
                         <motion.div key="open" className="relative" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }}>
                             <Bot size={32} />
                             <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-40"></span>
                                 <span className="relative inline-flex rounded-full h-4 w-4 bg-white items-center justify-center">
                                     <Sparkles size={10} className="text-blue-600" />
                                 </span>

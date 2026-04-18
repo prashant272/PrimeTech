@@ -14,9 +14,6 @@ const ITWhatsAppButton = () => {
                 Chat with our experts
             </div>
 
-            {/* Ripple Effect */}
-            <div className="absolute inset-0 bg-[#25D366] rounded-full animate-ping opacity-20"></div>
-
             {/* The Button */}
             <div className="relative w-16 h-16 bg-[#25D366] rounded-full flex items-center justify-center shadow-2xl shadow-green-500/40 hover:scale-110 transition-all duration-300 ring-4 ring-green-900/10">
                 <MessageCircle size={32} className="text-white" fill="white" />
