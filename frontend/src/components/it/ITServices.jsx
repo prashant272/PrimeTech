@@ -87,10 +87,10 @@ const ITServices = () => {
         setModalData({
             category: 'service',
             requirement: `Inquiry for ${svc.title}`,
-            serviceType: svc.title.includes('Web') ? 'Web Development' : 
-                         svc.title.includes('App') ? 'App Development' :
-                         svc.title.includes('Cloud') ? 'Cloud/DevOps' :
-                         svc.title.includes('SEO') ? 'SEO/Marketing' : 'Other'
+            serviceType: svc.title.includes('Web') ? 'Web Development' :
+                svc.title.includes('App') ? 'App Development' :
+                    svc.title.includes('Cloud') ? 'Cloud/DevOps' :
+                        svc.title.includes('SEO') ? 'SEO/Marketing' : 'Other'
         });
         setIsModalOpen(true);
     };
@@ -181,9 +181,9 @@ const ITServices = () => {
             </div>
 
             {/* Modal Integration */}
-            <ITContactModal 
-                isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
+            <ITContactModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
                 initialData={modalData}
             />
         </section>
