@@ -92,6 +92,7 @@ const AdminDashboard = () => {
     const [toasts, setToasts] = useState([]);
     const [confirmModal, setConfirmModal] = useState(null); // { slug, title }
     const [expandedAppId, setExpandedAppId] = useState(null);
+    const [expandedLeadId, setExpandedLeadId] = useState(null);
     const navigate = useNavigate();
 
     const showToast = useCallback((message, type = 'info') => {
@@ -434,7 +435,12 @@ const AdminDashboard = () => {
                                 </div>
 
                                 <div className="bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden">
-                                    <LeadsTable leads={leads} loading={loading} />
+                                    <LeadsTable 
+                                        leads={leads} 
+                                        loading={loading} 
+                                        expandedId={expandedLeadId}
+                                        setExpandedId={setExpandedLeadId}
+                                    />
                                 </div>
                             </motion.div>
                         )}
@@ -994,7 +1000,7 @@ const StatCard = ({ label, value, icon, color }) => (
     </div>
 );
 
-const LeadsTable = ({ leads, loading }) => (
+const LeadsTable = ({ leads, loading, expandedId, setExpandedId }) => (
     <div className="overflow-x-auto">
         <table className="w-full text-left">
             <thead>
@@ -1009,31 +1015,90 @@ const LeadsTable = ({ leads, loading }) => (
                 {loading ? <tr><td colSpan="4" className="px-8 py-20 text-center text-white/20">Loading...</td></tr> :
                     leads.length === 0 ? <tr><td colSpan="4" className="px-8 py-20 text-center text-white/20">No leads.</td></tr> :
                         leads.map(lead => (
-                            <tr key={lead._id} className="hover:bg-white/[0.01] transition-colors group">
-                                <td className="px-8 py-6">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-sm font-bold text-white">{lead.name}</span>
-                                        <div className="flex gap-4 text-[10px] text-white/40">
-                                            <span className="flex items-center gap-1"><Mail size={10} /> {lead.email}</span>
-                                            <span className="flex items-center gap-1"><Phone size={10} /> {lead.mobile}</span>
+                            <React.Fragment key={lead._id}>
+                                <tr 
+                                    onClick={() => setExpandedId(expandedId === lead._id ? null : lead._id)}
+                                    className={`hover:bg-white/[0.02] transition-colors group cursor-pointer ${expandedId === lead._id ? 'bg-blue-500/5' : ''}`}
+                                >
+                                    <td className="px-8 py-6">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-sm font-bold text-white">{lead.name}</span>
+                                            <div className="flex gap-4 text-[10px] text-white/40">
+                                                <span className="flex items-center gap-1"><Mail size={10} /> {lead.email}</span>
+                                                <span className="flex items-center gap-1"><Phone size={10} /> {lead.mobile}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td className="px-8 py-6">
-                                    <div className="flex flex-col items-start gap-2">
-                                        <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded text-[9px] font-black uppercase tracking-widest drop-shadow-sm">{lead.source}</span>
-                                        <span className="inline-block px-4 py-2 bg-[#0a1120] border border-blue-500/20 rounded-xl text-xs font-medium tracking-wide text-blue-100 max-w-xs leading-relaxed shadow-inner">{lead.interest}</span>
-                                    </div>
-                                </td>
-                                <td className="px-8 py-6">
-                                    <span className="flex items-center gap-2 text-[10px] font-black uppercase text-blue-500">
-                                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span> New
-                                    </span>
-                                </td>
-                                <td className="px-8 py-6 text-right text-[10px] font-bold text-white/20">
-                                    {new Date(lead.createdAt).toLocaleDateString()}
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <div className="flex flex-col items-start gap-2">
+                                            <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded text-[9px] font-black uppercase tracking-widest drop-shadow-sm">{lead.source}</span>
+                                            <span className="inline-block px-4 py-2 bg-[#0a1120] border border-blue-500/20 rounded-xl text-xs font-medium tracking-wide text-blue-100 max-w-xs leading-relaxed shadow-inner">{lead.interest}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <span className="flex items-center gap-2 text-[10px] font-black uppercase text-blue-500">
+                                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span> New
+                                        </span>
+                                    </td>
+                                    <td className="px-8 py-6 text-right text-[10px] font-bold text-white/20">
+                                        <div className="flex flex-col items-end gap-1">
+                                            {new Date(lead.createdAt).toLocaleDateString()}
+                                            <span className="text-[8px] text-white/10 uppercase font-black">Click to view journey</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <AnimatePresence>
+                                    {expandedId === lead._id && (
+                                        <tr>
+                                            <td colSpan="4" className="px-8 py-0">
+                                                <motion.div 
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    className="overflow-hidden"
+                                                >
+                                                    <div className="py-8 border-t border-white/5 bg-white/[0.01]">
+                                                        <div className="flex items-center gap-3 mb-6 px-4">
+                                                            <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
+                                                                <Clock size={16} />
+                                                            </div>
+                                                            <div>
+                                                                <h4 className="text-[10px] font-black uppercase tracking-widest text-white/40">User Journey Log</h4>
+                                                                <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">Timeline of activity before submission</p>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="space-y-4 max-w-2xl">
+                                                            {lead.activityLogs && lead.activityLogs.length > 0 ? (
+                                                                lead.activityLogs.map((log, lidx) => (
+                                                                    <div key={lidx} className="flex gap-4 group/log px-4">
+                                                                        <div className="flex flex-col items-center">
+                                                                            <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 ring-4 ring-blue-500/10"></div>
+                                                                            {lidx !== lead.activityLogs.length - 1 && <div className="w-px h-full bg-white/5 my-1"></div>}
+                                                                        </div>
+                                                                        <div className="pb-4">
+                                                                            <p className="text-xs font-bold text-white/80 group-hover/log:text-blue-400 transition-colors">{log.action}</p>
+                                                                            <div className="flex items-center gap-3 mt-1">
+                                                                                <span className="text-[10px] text-white/20 font-black uppercase tracking-widest">{new Date(log.timestamp).toLocaleTimeString()}</span>
+                                                                                <span className="w-1 h-1 rounded-full bg-white/5"></span>
+                                                                                <span className="text-[10px] text-blue-500/40 font-medium">{log.path}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <div className="px-4 py-10 text-center bg-white/5 rounded-3xl border border-white/5">
+                                                                    <p className="text-[10px] font-black uppercase tracking-widest text-white/20 italic">No activity logs captured for this lead.</p>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </AnimatePresence>
+                            </React.Fragment>
                         ))}
             </tbody>
         </table>

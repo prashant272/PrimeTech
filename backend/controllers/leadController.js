@@ -19,7 +19,8 @@ exports.createLead = async (req, res) => {
             mobile,
             email,
             source: source || 'Chatbot',
-            interest: interest || 'General Inquiry'
+            interest: interest || 'General Inquiry',
+            activityLogs: req.body.activityLogs || []
         });
 
         res.status(201).json({
@@ -53,5 +54,32 @@ exports.getLeads = async (req, res) => {
             success: false,
             message: 'Server error while fetching leads'
         });
+    }
+};
+
+// @desc    Add activity log to existing lead
+// @route   PATCH /api/leads/:id/activity
+// @access  Public
+exports.addLeadActivity = async (req, res) => {
+    try {
+        const { action, path, timestamp } = req.body;
+        const lead = await Lead.findByIdAndUpdate(
+            req.params.id,
+            { 
+                $push: { 
+                    activityLogs: { action, path, timestamp: timestamp || Date.now() } 
+                } 
+            },
+            { new: true }
+        );
+
+        if (!lead) {
+            return res.status(404).json({ success: false, message: 'Lead not found' });
+        }
+
+        res.status(200).json({ success: true, data: lead });
+    } catch (error) {
+        console.error('Error adding activity:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 };

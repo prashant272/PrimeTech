@@ -72,12 +72,15 @@ export default function LeadCapturePopup() {
         setError('');
 
         try {
+            const activityLogs = JSON.parse(localStorage.getItem('pending_activity_logs') || '[]');
+
             const payload = {
                 name: formData.name,
                 email: formData.email,
                 mobile: formData.mobile,
                 source: 'Popup',
-                interest: formData.reason === 'Others' ? formData.customReason : formData.reason
+                interest: formData.reason === 'Others' ? formData.customReason : formData.reason,
+                activityLogs: activityLogs
             };
 
             const response = await api.post('/leads', payload);
@@ -85,6 +88,15 @@ export default function LeadCapturePopup() {
             if (response.data.success) {
                 setIsSubmitted(true);
                 localStorage.setItem('lead_submitted', 'true');
+                
+                // Save lead ID with 30-day expiry
+                const expiry = new Date().getTime() + (30 * 24 * 60 * 60 * 1000); // 30 Days
+                localStorage.setItem('captured_lead_data', JSON.stringify({
+                    id: response.data.data._id,
+                    expiry: expiry
+                }));
+
+                localStorage.removeItem('pending_activity_logs');
                 setTimeout(() => setIsOpen(false), 3000);
             }
         } catch (error) {

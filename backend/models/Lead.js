@@ -25,6 +25,11 @@ const leadSchema = new mongoose.Schema({
         type: String,
         default: 'General'
     },
+    activityLogs: [{
+        action: String,
+        path: String,
+        timestamp: { type: Date, default: Date.now }
+    }],
     createdAt: {
         type: Date,
         default: Date.now
