@@ -19,11 +19,14 @@ import ITCareers from './pages/ITCareers';
 import ITBackground3D from './components/it/ITBackground3D';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import LeadCapturePopup from './components/LeadCapturePopup';
+
 
 function App() {
   return (
     <Router>
       <ScrollToTop />
+      <LeadCapturePopup />
       <Routes>
         {/* Admin Section */}
         <Route path="/prime-admin" element={<AdminLogin />} />
