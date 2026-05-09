@@ -29,6 +29,9 @@ app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/leads", require("./routes/leadRoutes"));
 app.use("/api/content", require("./routes/contentRoutes"));
 app.use("/api/recruit", require("./routes/applicationRoutes"));
+app.use("/api/ai", require("./routes/aiRoutes"));
+
+
 
 app.get("/", (req, res) => {
     res.send("Prime Impact Professional API Running...");

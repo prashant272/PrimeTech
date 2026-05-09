@@ -58,14 +58,16 @@ const ITFooter = () => {
 
                         <div className="flex gap-4">
                             {[
-                                { Icon: Facebook, color: '#1877F2', href: '#' },
-                                { Icon: Instagram, color: '#E4405F', href: '#' },
-                                { Icon: Twitter, color: '#1DA1F2', href: '#' },
-                                { Icon: Linkedin, color: '#0A66C2', href: '#' }
+                                { Icon: Facebook, color: '#1877F2', href: 'https://www.facebook.com/profile.php?id=61586386790496' },
+                                { Icon: Instagram, color: '#E4405F', href: 'https://www.instagram.com/primeimpactus/' },
+                                { Icon: Phone, color: '#25D366', href: 'https://wa.me/919801017333' },
+                                { Icon: Linkedin, color: '#0A66C2', href: 'https://www.linkedin.com/company/prime-impact-it-solutions/' }
                             ].map((social, i) => (
                                 <motion.a
                                     key={i}
                                     href={social.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     whileHover={{ scale: 1.1, y: -5 }}
                                     whileTap={{ scale: 0.95 }}
                                     className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all bg-white/[0.03] border border-white/5 hover:border-white/20 group relative overflow-hidden"
@@ -88,7 +90,7 @@ const ITFooter = () => {
                                 <li key={item}>
                                     <Link
                                         to={item === 'Home' ? '/' : `/${item.toLowerCase().replace(/ /g, '-')}`}
-                                        className="text-gray-300 hover:text-white transition-all duration-300 flex items-center group text-[15px] font-medium"
+                                        className="text-white hover:text-blue-400 transition-all duration-300 flex items-center group text-[15px] font-bold"
                                     >
                                         <span className="w-0 group-hover:w-6 h-[1px] bg-blue-500 mr-0 group-hover:mr-4 transition-all duration-500"></span>
                                         {item}
@@ -116,12 +118,12 @@ const ITFooter = () => {
                                     </div>
                                     <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">Delhi, India</h5>
                                 </div>
-                                <p className="text-gray-300 text-sm leading-relaxed mb-4 font-light">
+                                <p className="text-white text-sm leading-relaxed mb-4 font-medium">
                                     T-1, 3rd Floor HL Plaza, Dwarka Sector 12, New Delhi
                                 </p>
                                 <div className="flex gap-4 items-center">
                                     <Phone size={14} className="text-blue-400 opacity-60" />
-                                    <div className="flex flex-col text-[13px] text-gray-200 font-medium">
+                                    <div className="flex flex-col text-[13px] text-white font-bold">
                                         <span>+91 9319 9319 06</span>
                                         <span>+91 9801 0173 33</span>
                                     </div>
@@ -139,26 +141,17 @@ const ITFooter = () => {
                                     </div>
                                     <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Ajman, U.A.E.</h5>
                                 </div>
-                                <p className="text-gray-300 text-sm leading-relaxed mb-4 font-light">
+                                <p className="text-white text-sm leading-relaxed mb-4 font-medium">
                                     Near Lucky Roundabout, 3912, Ajman, U.A.E.
                                 </p>
                                 <div className="flex gap-4 items-center">
                                     <Phone size={14} className="text-emerald-400 opacity-60" />
-                                    <div className="flex flex-col text-[13px] text-gray-200 font-medium">
+                                    <div className="flex flex-col text-[13px] text-white font-bold">
                                         <span>+971 6 742 5385</span>
                                         <span>+971 58 512 2033</span>
                                     </div>
                                 </div>
                             </motion.div>
-
-                            <div className="flex items-center gap-4 group cursor-pointer px-4">
-                                <div className="w-10 h-10 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center transition-all group-hover:border-white/20">
-                                    <Mail size={18} className="text-gray-400 group-hover:text-white transition-colors" />
-                                </div>
-                                <span className="text-gray-200 text-sm font-medium group-hover:text-white transition-colors">
-                                    hello@primeimpact.in
-                                </span>
-                            </div>
                         </div>
                     </div>
 
@@ -168,7 +161,7 @@ const ITFooter = () => {
                             <span className="w-10 h-[1px] bg-gradient-to-r from-emerald-500 to-transparent"></span>
                             Newsletter
                         </h4>
-                        <p className="text-gray-200 text-lg mb-4 leading-relaxed font-light">
+                        <p className="text-white text-lg mb-4 leading-relaxed font-medium">
                             Join our elite list of 5,000+ tech visionaries.
                         </p>
                         <form className="relative group/form" onSubmit={e => e.preventDefault()}>
@@ -176,7 +169,7 @@ const ITFooter = () => {
                             <input
                                 type="email"
                                 placeholder="name@company.com"
-                                className="relative w-full bg-[#0d121f] border border-white/10 rounded-[1.8rem] px-8 py-6 text-sm focus:outline-none focus:border-white/30 transition-all placeholder:text-gray-600 pr-20 font-medium text-white"
+                                className="relative w-full bg-[#0d121f] border border-white/10 rounded-[1.8rem] px-8 py-6 text-sm focus:outline-none focus:border-white/30 transition-all placeholder:text-gray-600 pr-20 font-bold text-white"
                             />
                             <button className="absolute right-3 top-3 bottom-3 w-14 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 flex items-center justify-center transition-all shadow-xl shadow-blue-900/20 group-hover:scale-105 active:scale-95 text-white">
                                 <ArrowRight size={22} strokeWidth={2.5} />
@@ -186,21 +179,21 @@ const ITFooter = () => {
                 </div>
 
                 {/* Footer Bottom */}
-                <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="flex flex-col md:flex-row items-center gap-8">
-                        <p className="text-gray-500 text-sm font-medium">
-                            © {new Date().getFullYear()} Prime Impact Solutions.
+                <div className="pt-10 md:pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 md:gap-6">
+                    <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12">
+                        <p className="text-white text-[13px] md:text-sm font-bold tracking-tight">
+                            © {new Date().getFullYear()} <span className="text-blue-400">Prime Impact Solutions.</span>
                         </p>
-                        <div className="flex gap-8 text-[13px] font-bold text-gray-600">
-                            <a href="#" className="hover:text-white transition-colors tracking-wide uppercase">Privacy</a>
-                            <a href="#" className="hover:text-white transition-colors tracking-wide uppercase">Terms</a>
-                            <a href="#" className="hover:text-white transition-colors tracking-wide uppercase">Cookies</a>
+                        <div className="flex gap-8 text-[11px] md:text-[12px] font-black text-white uppercase tracking-[0.2em]">
+                            <Link to="/privacy" className="hover:text-blue-400 transition-all duration-300 hover:tracking-[0.3em]">Privacy</Link>
+                            <Link to="/terms" className="hover:text-purple-400 transition-all duration-300 hover:tracking-[0.3em]">Terms</Link>
+                            <Link to="/cookies" className="hover:text-emerald-400 transition-all duration-300 hover:tracking-[0.3em]">Cookies</Link>
                         </div>
                     </div>
                     
-                    <div className="flex items-center gap-6">
-                        <div className="h-10 w-[1px] bg-white/10 hidden md:block"></div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-700">
+                    <div className="flex items-center gap-6 group">
+                        <div className="h-8 w-[1px] bg-white/20 hidden md:block group-hover:bg-blue-500/50 transition-colors duration-500"></div>
+                        <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.6em] text-white/40 group-hover:text-blue-400 transition-all duration-700 italic">
                             Designed for Excellence
                         </p>
                     </div>

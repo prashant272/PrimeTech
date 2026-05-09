@@ -31,7 +31,11 @@ import {
     Clock,
     FileText,
     FileCheck,
-    Download
+    Download,
+    Volume2,
+    Zap,
+    Settings,
+    Brain
 } from 'lucide-react';
 import api from '../api/axios';
 
@@ -42,8 +46,8 @@ const Toast = ({ toasts }) => (
             {toasts.map(t => (
                 <motion.div key={t.id} initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 60 }}
                     className={`flex items-center gap-3 px-5 py-4 rounded-2xl shadow-2xl border pointer-events-auto min-w-[280px] ${t.type === 'success' ? 'bg-emerald-950 border-emerald-500/40 text-emerald-300' :
-                            t.type === 'error' ? 'bg-red-950 border-red-500/40 text-red-300' :
-                                'bg-blue-950 border-blue-500/40 text-blue-300'
+                        t.type === 'error' ? 'bg-red-950 border-red-500/40 text-red-300' :
+                            'bg-blue-950 border-blue-500/40 text-blue-300'
                         }`}>
                     {t.type === 'success' ? <CheckCircle2 size={18} /> : t.type === 'error' ? <AlertTriangle size={18} /> : <Info size={18} />}
                     <span className="text-sm font-semibold">{t.message}</span>
@@ -85,6 +89,7 @@ const AdminDashboard = () => {
     const [blogs, setBlogs] = useState([]);
     const [jobs, setJobs] = useState([]);
     const [applications, setApplications] = useState([]);
+    const [chatConfig, setChatConfig] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAddingNew, setIsAddingNew] = useState(false);
     const [stats, setStats] = useState({ total: 0, products: 0, visa: 0, applications: 0 });
@@ -93,6 +98,8 @@ const AdminDashboard = () => {
     const [confirmModal, setConfirmModal] = useState(null); // { slug, title }
     const [expandedAppId, setExpandedAppId] = useState(null);
     const [expandedLeadId, setExpandedLeadId] = useState(null);
+    const [chatLogs, setChatLogs] = useState([]);
+    const [logFilter, setLogFilter] = useState('all');
     const navigate = useNavigate();
 
     const showToast = useCallback((message, type = 'info') => {
@@ -108,6 +115,18 @@ const AdminDashboard = () => {
             return;
         }
         fetchData();
+
+        // Auto-refresh logic for the Chat tab to show real-time learning
+        let interval;
+        if (activeTab === 'chat') {
+            interval = setInterval(() => {
+                fetchData();
+            }, 10000); // 10 seconds sync
+        }
+
+        return () => {
+            if (interval) clearInterval(interval);
+        };
     }, [navigate, activeTab]);
 
     const fetchData = async () => {
@@ -155,6 +174,15 @@ const AdminDashboard = () => {
                     setApplications(response.data.data);
                     setStats(prev => ({ ...prev, applications: response.data.data.length }));
                 }
+            } else if (activeTab === 'chat') {
+                const configRes = await api.get('/admin/chat-config');
+                setChatConfig(configRes.data);
+                
+                const logsRes = await api.get('/ai/logs');
+                if (logsRes.data && logsRes.data.data) {
+                    console.log(`Fetched ${logsRes.data.data.length} logs`);
+                    setChatLogs(logsRes.data.data);
+                }
             }
         } catch (error) {
             console.error(`Failed to fetch ${activeTab}:`, error);
@@ -164,6 +192,34 @@ const AdminDashboard = () => {
             }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleTrainLog = async (log) => {
+        try {
+            const token = localStorage.getItem('adminToken');
+            const newRule = { 
+                keyword: log.query, 
+                action: 'message', 
+                value: log.response 
+            };
+            
+            const updatedRules = [...chatConfig.rules, newRule];
+            const newConfig = { ...chatConfig, rules: updatedRules };
+            
+            await api.post('/admin/chat-config', newConfig, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            await api.post(`/ai/train/${log._id}`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            setChatConfig(newConfig);
+            setChatLogs(prev => prev.map(l => l._id === log._id ? { ...l, isTrained: true } : l));
+            showToast('Knowledge added to Bot successfully!', 'success');
+        } catch (error) {
+            showToast('Failed to train bot', 'error');
         }
     };
 
@@ -404,6 +460,10 @@ const AdminDashboard = () => {
                             <FileCheck size={20} />
                             <span className="font-bold text-sm tracking-widest uppercase">Job Applications</span>
                         </button>
+                        <button onClick={() => setActiveTab('chat')} className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all ${activeTab === 'chat' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-white/40 hover:bg-white/5'}`}>
+                            <Sparkles size={20} />
+                            <span className="font-bold text-sm tracking-widest uppercase">AI Chatbot</span>
+                        </button>
                     </nav>
                 </div>
 
@@ -435,9 +495,9 @@ const AdminDashboard = () => {
                                 </div>
 
                                 <div className="bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden">
-                                    <LeadsTable 
-                                        leads={leads} 
-                                        loading={loading} 
+                                    <LeadsTable
+                                        leads={leads}
+                                        loading={loading}
                                         expandedId={expandedLeadId}
                                         setExpandedId={setExpandedLeadId}
                                     />
@@ -786,7 +846,7 @@ const AdminDashboard = () => {
                                             ) : (
                                                 applications.map(app => (
                                                     <React.Fragment key={app._id}>
-                                                        <tr 
+                                                        <tr
                                                             className={`hover:bg-white/[0.02] cursor-pointer transition-colors group ${expandedAppId === app._id ? 'bg-blue-500/5' : ''}`}
                                                             onClick={() => setExpandedAppId(expandedAppId === app._id ? null : app._id)}
                                                         >
@@ -807,9 +867,9 @@ const AdminDashboard = () => {
                                                                 </span>
                                                             </td>
                                                             <td className="px-8 py-6">
-                                                                <a 
-                                                                    href={app.resumeUrl} 
-                                                                    target="_blank" 
+                                                                <a
+                                                                    href={app.resumeUrl}
+                                                                    target="_blank"
                                                                     rel="noopener noreferrer"
                                                                     onClick={(e) => e.stopPropagation()}
                                                                     className="flex items-center gap-2 text-blue-400 hover:text-white text-xs font-black uppercase tracking-widest transition-colors group/link"
@@ -818,14 +878,13 @@ const AdminDashboard = () => {
                                                                 </a>
                                                             </td>
                                                             <td className="px-8 py-6" onClick={(e) => e.stopPropagation()}>
-                                                                <select 
-                                                                    value={app.status || 'Pending'} 
+                                                                <select
+                                                                    value={app.status || 'Pending'}
                                                                     onChange={(e) => handleUpdateAppStatus(app._id, e.target.value)}
-                                                                    className={`bg-[#070b14] border border-white/10 rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-blue-500/50 cursor-pointer ${
-                                                                        app.status === 'Hired' ? 'text-emerald-400 border-emerald-500/30' :
-                                                                        app.status === 'Interviewed' ? 'text-blue-400 border-blue-500/30' :
-                                                                        app.status === 'Rejected' ? 'text-red-400 border-red-500/30' : 'text-gray-400'
-                                                                    }`}
+                                                                    className={`bg-[#070b14] border border-white/10 rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-blue-500/50 cursor-pointer ${app.status === 'Hired' ? 'text-emerald-400 border-emerald-500/30' :
+                                                                            app.status === 'Interviewed' ? 'text-blue-400 border-blue-500/30' :
+                                                                                app.status === 'Rejected' ? 'text-red-400 border-red-500/30' : 'text-gray-400'
+                                                                        }`}
                                                                 >
                                                                     <option value="Pending">Pending</option>
                                                                     <option value="Interviewed">Interviewed</option>
@@ -834,7 +893,7 @@ const AdminDashboard = () => {
                                                                 </select>
                                                             </td>
                                                             <td className="px-8 py-6">
-                                                                <button 
+                                                                <button
                                                                     onClick={(e) => { e.stopPropagation(); handleDeleteApplication(app._id, app.candidateName); }}
                                                                     className="p-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl transition-all opacity-0 group-hover:opacity-100"
                                                                 >
@@ -846,7 +905,7 @@ const AdminDashboard = () => {
                                                             {expandedAppId === app._id && (
                                                                 <tr>
                                                                     <td colSpan="5" className="px-8 py-0">
-                                                                        <motion.div 
+                                                                        <motion.div
                                                                             initial={{ height: 0, opacity: 0 }}
                                                                             animate={{ height: 'auto', opacity: 1 }}
                                                                             exit={{ height: 0, opacity: 0 }}
@@ -936,6 +995,54 @@ const AdminDashboard = () => {
                                 </div>
                             </motion.div>
                         )}
+
+                        {activeTab === 'chat' && (
+                            <motion.div key="chat" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-12">
+                                <div className="p-8 bg-blue-600/5 border border-blue-500/10 rounded-[2.5rem]">
+                                    <ChatManager
+                                        config={chatConfig}
+                                        onSave={async (newConfig) => {
+                                            try {
+                                                const token = localStorage.getItem('adminToken');
+                                                const response = await api.post('/admin/chat-config', newConfig, {
+                                                    headers: { Authorization: `Bearer ${token}` }
+                                                });
+                                                setChatConfig(response.data);
+                                                showToast('Settings Saved!', 'success');
+                                            } catch (error) {
+                                                showToast('Save Failed', 'error');
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                
+                                <div className="space-y-8">
+                                    <div className="flex items-center justify-between px-4">
+                                        <div>
+                                            <h2 className="text-2xl font-black uppercase" style={{ fontFamily: '"Outfit", sans-serif' }}>Training Intelligence</h2>
+                                            <p className="text-white/30 text-[10px] mt-1 font-bold uppercase tracking-[0.2em]">Convert past interactions into permanent rules</p>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <select 
+                                                value={logFilter} 
+                                                onChange={(e) => setLogFilter(e.target.value)}
+                                                className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase text-white outline-none focus:border-blue-500/50"
+                                            >
+                                                <option value="all" className="bg-[#0a1120]">All Sources</option>
+                                                <option value="gemini" className="bg-[#0a1120]">Gemini AI</option>
+                                                <option value="rule" className="bg-[#0a1120]">Static Rules</option>
+                                            </select>
+                                            <button onClick={fetchData} className="p-2 bg-white/5 border border-white/10 rounded-lg active:rotate-180 duration-500 text-white/40 hover:text-white"><RefreshCw size={16} /></button>
+                                        </div>
+                                    </div>
+                                    <TrainingLogsTable 
+                                        logs={chatLogs.filter(l => logFilter === 'all' || l.source === logFilter)} 
+                                        loading={loading} 
+                                        onTrain={handleTrainLog}
+                                    />
+                                </div>
+                            </motion.div>
+                        )}
                     </AnimatePresence>
                 </div>
             </div>
@@ -1016,7 +1123,7 @@ const LeadsTable = ({ leads, loading, expandedId, setExpandedId }) => (
                     leads.length === 0 ? <tr><td colSpan="4" className="px-8 py-20 text-center text-white/20">No leads.</td></tr> :
                         leads.map(lead => (
                             <React.Fragment key={lead._id}>
-                                <tr 
+                                <tr
                                     onClick={() => setExpandedId(expandedId === lead._id ? null : lead._id)}
                                     className={`hover:bg-white/[0.02] transition-colors group cursor-pointer ${expandedId === lead._id ? 'bg-blue-500/5' : ''}`}
                                 >
@@ -1051,7 +1158,7 @@ const LeadsTable = ({ leads, loading, expandedId, setExpandedId }) => (
                                     {expandedId === lead._id && (
                                         <tr>
                                             <td colSpan="4" className="px-8 py-0">
-                                                <motion.div 
+                                                <motion.div
                                                     initial={{ height: 0, opacity: 0 }}
                                                     animate={{ height: 'auto', opacity: 1 }}
                                                     exit={{ height: 0, opacity: 0 }}
@@ -1888,11 +1995,10 @@ const JobForm = ({ data, onSave, onCancel }) => {
                                     key={t}
                                     type="button"
                                     onClick={() => setFormData(prev => ({ ...prev, type: t }))}
-                                    className={`px-4 py-3 rounded-xl border transition-all text-[11px] font-black uppercase text-center ${
-                                        formData.type === t
-                                        ? 'bg-blue-600/10 border-blue-500 text-blue-400'
-                                        : 'bg-white/5 border-white/5 hover:border-white/20 text-white/40'
-                                    }`}
+                                    className={`px-4 py-3 rounded-xl border transition-all text-[11px] font-black uppercase text-center ${formData.type === t
+                                            ? 'bg-blue-600/10 border-blue-500 text-blue-400'
+                                            : 'bg-white/5 border-white/5 hover:border-white/20 text-white/40'
+                                        }`}
                                 >
                                     {t}
                                 </button>
@@ -1990,6 +2096,242 @@ const JobForm = ({ data, onSave, onCancel }) => {
     );
 };
 
+const TrainingLogsTable = ({ logs, loading, onTrain }) => (
+    <div className="bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden">
+        <table className="w-full text-left">
+            <thead>
+                <tr className="bg-white/[0.02]">
+                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-white/30">User Query</th>
+                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-white/30">AI Response</th>
+                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-white/30">Source</th>
+                    <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-white/30 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+                {loading ? <tr><td colSpan="4" className="px-8 py-20 text-center text-white/20 uppercase tracking-widest text-xs font-bold">Synchronizing Logs...</td></tr> :
+                    logs.length === 0 ? <tr><td colSpan="4" className="px-8 py-20 text-center text-white/20 uppercase tracking-widest text-xs font-bold">No training data yet.</td></tr> :
+                        logs.map(log => (
+                            <tr key={log._id} className={`hover:bg-white/[0.02] transition-all group ${log.isTrained ? 'opacity-40' : ''}`}>
+                                <td className="px-8 py-6 max-w-xs">
+                                    <p className="text-sm font-bold text-white leading-relaxed">{log.query}</p>
+                                </td>
+                                <td className="px-8 py-6">
+                                    <div className="bg-[#0a1120] border border-white/10 p-4 rounded-2xl group-hover:border-blue-500/20 transition-all">
+                                        <p className="text-xs text-white/60 leading-relaxed italic line-clamp-3">"{log.response}"</p>
+                                    </div>
+                                </td>
+                                <td className="px-8 py-6">
+                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                                        log.source === 'gemini' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' : 
+                                        log.source === 'rule' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 
+                                        'bg-gray-500/10 text-gray-400 border-gray-500/20'
+                                    }`}>
+                                        {log.source}
+                                    </span>
+                                </td>
+                                <td className="px-8 py-6 text-right">
+                                    {log.isTrained ? (
+                                        <div className="flex items-center justify-end gap-2 text-emerald-400 font-black uppercase text-[10px]">
+                                            <Check size={14} /> Trained
+                                        </div>
+                                    ) : (
+                                        <button 
+                                            onClick={() => onTrain(log)}
+                                            className="px-4 py-2 bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ml-auto"
+                                        >
+                                            <Brain size={12} /> Add to Rules
+                                        </button>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+            </tbody>
+        </table>
+    </div>
+);
+
 export default AdminDashboard;
 
+// --- Chatbot Manager ---
+const ChatManager = ({ config, onSave }) => {
+    const [formData, setFormData] = useState({
+        greetingMessage: config?.greetingMessage || '',
+        voiceMessage: config?.voiceMessage || '',
+        enabled: config?.enabled !== undefined ? config.enabled : true,
+        rules: config?.rules || []
+    });
 
+    // Sync local state when backend config updates (Automatic Learning)
+    useEffect(() => {
+        if (config) {
+            setFormData({
+                greetingMessage: config.greetingMessage || '',
+                voiceMessage: config.voiceMessage || '',
+                enabled: config.enabled !== undefined ? config.enabled : true,
+                rules: config.rules || []
+            });
+        }
+    }, [config]);
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    };
+
+    const addRule = () => {
+        setFormData(prev => ({ ...prev, rules: [...prev.rules, { keyword: '', action: 'message', value: '' }] }));
+    };
+
+    const updateRule = (index, field, value) => {
+        const updated = [...formData.rules];
+        updated[index] = { ...updated[index], [field]: value };
+        setFormData(prev => ({ ...prev, rules: updated }));
+    };
+
+    const removeRule = (index) => {
+        setFormData(prev => ({ ...prev, rules: prev.rules.filter((_, i) => i !== index) }));
+    };
+
+    // Reverse rules to show newest training first
+    const sortedRules = [...formData.rules].reverse();
+
+    return (
+        <div className="space-y-10">
+            <div className="flex items-center justify-between border-b border-white/5 pb-8">
+                <div>
+                    <h2 className="text-3xl font-black uppercase" style={{ fontFamily: '"Outfit", sans-serif' }}>
+                        AI Chatbot Control
+                    </h2>
+                    <p className="text-white/30 text-xs mt-1 font-bold uppercase tracking-[0.2em]">Manage workflow, keywords, and voice greetings</p>
+                </div>
+                <div className="flex items-center gap-4 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Bot Status</span>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="enabled" checked={formData.enabled} onChange={handleChange} className="sr-only peer" />
+                        <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="p-8 rounded-[2rem] bg-white/[0.02] border border-white/5 space-y-6">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400">
+                            <MessageSquare size={18} />
+                        </div>
+                        <h3 className="text-lg font-bold">Text Greeting</h3>
+                    </div>
+                    <textarea
+                        name="greetingMessage"
+                        value={formData.greetingMessage}
+                        onChange={handleChange}
+                        rows={3}
+                        placeholder="The first text message user sees..."
+                        className="w-full bg-[#070b14] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-blue-500/50 outline-none resize-none"
+                    />
+                </div>
+
+                <div className="p-8 rounded-[2rem] bg-white/[0.02] border border-white/5 space-y-6">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-400">
+                            <Volume2 size={18} />
+                        </div>
+                        <h3 className="text-lg font-bold">Voice Greeting</h3>
+                    </div>
+                    <textarea
+                        name="voiceMessage"
+                        value={formData.voiceMessage}
+                        onChange={handleChange}
+                        rows={3}
+                        placeholder="Text to be spoken by AI when user arrives..."
+                        className="w-full bg-[#070b14] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none resize-none"
+                    />
+                </div>
+            </div>
+
+            <div className="space-y-8">
+                <div className="flex items-center justify-between pb-4 border-b border-white/5">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400">
+                            <Zap size={22} />
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h3 className="text-xl font-black uppercase tracking-tight text-white/80">Active Workflow Rules</h3>
+                                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-[10px] font-black rounded-full border border-blue-500/20">
+                                    {formData.rules.length} Total
+                                </span>
+                            </div>
+                            <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">Automatic rules learned from AI or set by you</p>
+                        </div>
+                    </div>
+                    <button type="button" onClick={addRule} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2">
+                        <Plus size={14} /> New Manual Rule
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                    {sortedRules.map((rule, idx) => {
+                        const originalIdx = formData.rules.length - 1 - idx;
+                        return (
+                            <div key={originalIdx} className="grid grid-cols-1 md:grid-cols-12 gap-6 p-6 bg-white/[0.03] border border-white/10 rounded-3xl items-center group hover:border-blue-500/30 transition-all">
+                                <div className="md:col-span-3">
+                                    <label className="text-[9px] font-black uppercase text-white/20 mb-2 block">If user says</label>
+                                    <input
+                                        value={rule.keyword}
+                                        onChange={(e) => updateRule(originalIdx, 'keyword', e.target.value)}
+                                        placeholder="Keyword..."
+                                        className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-blue-500/30"
+                                    />
+                                </div>
+                                <div className="md:col-span-3">
+                                    <label className="text-[9px] font-black uppercase text-white/20 mb-2 block">Perform Action</label>
+                                    <select
+                                        value={rule.action}
+                                        onChange={(e) => updateRule(originalIdx, 'action', e.target.value)}
+                                        className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-blue-500/30"
+                                    >
+                                        <option value="message">Show Message</option>
+                                        <option value="navigate">Navigate to Page</option>
+                                        <option value="popup">Open Popup</option>
+                                    </select>
+                                </div>
+                                <div className="md:col-span-5">
+                                    <label className="text-[9px] font-black uppercase text-white/20 mb-2 block">Response Value</label>
+                                    <input
+                                        value={rule.value}
+                                        onChange={(e) => updateRule(originalIdx, 'value', e.target.value)}
+                                        placeholder="Enter response or URL..."
+                                        className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-blue-500/30"
+                                    />
+                                </div>
+                                <div className="md:col-span-1 flex justify-end pt-5">
+                                    <button onClick={() => removeRule(originalIdx)} className="p-3 text-red-500/20 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all">
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    })}
+                    {formData.rules.length === 0 && (
+                        <div className="py-12 border-2 border-dashed border-white/5 rounded-[2.5rem] flex flex-col items-center justify-center text-center">
+                            <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-white/10 mb-4">
+                                <Zap size={24} />
+                            </div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">No active rules. AI is currently handling all chats.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="pt-8 border-t border-white/5 flex justify-end">
+                <button
+                    onClick={() => onSave(formData)}
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-black px-12 py-5 rounded-[1.5rem] flex items-center gap-3 transition-all shadow-xl shadow-blue-900/40 uppercase tracking-widest text-[11px]"
+                >
+                    <Save size={20} /> Save Chatbot Settings
+                </button>
+            </div>
+        </div>
+    );
+};

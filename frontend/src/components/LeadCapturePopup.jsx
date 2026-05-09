@@ -59,7 +59,7 @@ export default function LeadCapturePopup() {
 
     const handleClose = () => {
         if (isSecondTime) return; // Cannot close if it's the second time
-        setIsOpen(false);
+        setIsOpen(true);
         setHasClosedOnce(true);
         localStorage.setItem('lead_closed_once', 'true');
     };

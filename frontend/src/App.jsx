@@ -16,11 +16,17 @@ import ITCaseStudyDetail from './pages/ITCaseStudyDetail';
 import ITBlogDetail from './pages/ITBlogDetail';
 import ITBlogList from './pages/ITBlogList';
 import ITCareers from './pages/ITCareers';
+import ITPrivacyPolicy from './pages/ITPrivacyPolicy';
+import ITTermsConditions from './pages/ITTermsConditions';
+import ITCookiesPolicy from './pages/ITCookiesPolicy';
 import ITBackground3D from './components/it/ITBackground3D';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import LeadCapturePopup from './components/LeadCapturePopup';
 import ActivityTracker from './components/ActivityTracker';
+
+import ChatBot from './components/it/ChatBot';
+import ITWhatsAppButton from './components/it/ITWhatsAppButton';
 
 
 function App() {
@@ -28,7 +34,7 @@ function App() {
     <Router>
       <ActivityTracker />
       <ScrollToTop />
-      <LeadCapturePopup />
+      {/* <LeadCapturePopup /> */}
       <Routes>
         {/* Admin Section */}
         <Route path="/prime-admin" element={<AdminLogin />} />
@@ -53,9 +59,14 @@ function App() {
                   <Route path="/careers" element={<ITCareers />} />
                   <Route path="/about" element={<ITAbout />} />
                   <Route path="/contact" element={<ITContact />} />
+                  <Route path="/privacy" element={<ITPrivacyPolicy />} />
+                  <Route path="/terms" element={<ITTermsConditions />} />
+                  <Route path="/cookies" element={<ITCookiesPolicy />} />
                 </Routes>
               </main>
               <ITFooter />
+              <ChatBot />
+              <ITWhatsAppButton />
             </div>
           </div>
         } />

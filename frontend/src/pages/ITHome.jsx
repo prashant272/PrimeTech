@@ -13,10 +13,9 @@ import ITFAQ from '../components/it/ITFAQ';
 import ITBlogPreview from '../components/it/ITBlogPreview';
 import ITCTA from '../components/it/ITCTA';
 import ITCertifications from '../components/it/ITCertifications';
-import ITWhatsAppButton from '../components/it/ITWhatsAppButton';
 import ITProductShowcase from '../components/it/ITProductShowcase';
 import ITVisaShowcase from '../components/it/ITVisaShowcase';
-import ITChatbot from '../components/it/ITChatbot';
+
 const ITHome = () => {
     return (
         <div className="relative min-h-screen text-white">
@@ -40,8 +39,6 @@ const ITHome = () => {
             <ITBlogPreview />
             <ITFAQ />
             <ITCTA />
-            <ITChatbot />
-            <ITWhatsAppButton />
         </div>
     );
 };

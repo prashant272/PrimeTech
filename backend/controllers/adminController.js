@@ -1,4 +1,5 @@
 const Admin = require('../models/Admin');
+const ChatConfig = require('../models/ChatConfig');
 const jwt = require('jsonwebtoken');
 
 // Generate JWT
@@ -29,4 +30,48 @@ exports.loginAdmin = async (req, res) => {
     }
 
     res.status(401).json({ message: 'Invalid email or password' });
+};
+
+// @desc    Get Chatbot Config
+// @route   GET /api/admin/chat-config
+// @access  Public (for frontend)
+exports.getChatConfig = async (req, res) => {
+    try {
+        let config = await ChatConfig.findOne();
+        if (!config) {
+            // Create default config if not exists
+            config = await ChatConfig.create({});
+        }
+        res.json(config);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching chatbot config', error: error.message });
+    }
+};
+
+// @desc    Update Chatbot Config
+// @route   POST /api/admin/chat-config
+// @access  Private/Admin
+exports.updateChatConfig = async (req, res) => {
+    try {
+        const { greetingMessage, voiceMessage, enabled, rules } = req.body;
+        let config = await ChatConfig.findOne();
+        
+        if (config) {
+            config.greetingMessage = greetingMessage;
+            config.voiceMessage = voiceMessage;
+            config.enabled = enabled;
+            config.rules = rules;
+            await config.save();
+        } else {
+            config = await ChatConfig.create({
+                greetingMessage,
+                voiceMessage,
+                enabled,
+                rules
+            });
+        }
+        res.json(config);
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating chatbot config', error: error.message });
+    }
 };
