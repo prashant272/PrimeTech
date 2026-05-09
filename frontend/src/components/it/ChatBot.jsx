@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, X, Send, User, Bot, Volume2, VolumeX, ChevronRight, Sparkles } from 'lucide-react';
+import { MessageSquare, X, Send, User, Bot, Volume2, VolumeX, ChevronRight, Sparkles, Mic, MicOff, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 
@@ -107,9 +107,52 @@ const ChatBot = () => {
         return () => clearTimeout(autoOpenTimer);
     }, []);
 
-    useEffect(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+    const [isListening, setIsListening] = useState(false);
+
+    // Voice Recognition Setup
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+    if (recognition) {
+        recognition.continuous = false;
+        recognition.lang = 'en-IN';
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setInput(transcript);
+            setIsListening(false);
+            // Auto-send voice input
+            setTimeout(() => {
+                handleVoiceSubmit(transcript);
+            }, 500);
+        };
+
+        recognition.onend = () => setIsListening(false);
+        recognition.onerror = () => setIsListening(false);
+    }
+
+    const startListening = () => {
+        if (!recognition) {
+            alert("Your browser does not support voice recognition. Please use Chrome.");
+            return;
+        }
+        setIsListening(true);
+        recognition.start();
+    };
+
+    const handleVoiceSubmit = (transcript) => {
+        if (!transcript.trim()) return;
+        const userMsg = {
+            id: Date.now(),
+            text: transcript,
+            sender: 'user',
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        setMessages(prev => [...prev, userMsg]);
+        setIsTyping(true);
+        processRule(transcript);
+    };
 
     const playVoice = (text) => {
         if (!('speechSynthesis' in window) || isMuted || !text) return;
@@ -406,15 +449,25 @@ const ChatBot = () => {
                                         value={input}
                                         onChange={(e) => setInput(e.target.value)}
                                         onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                                        placeholder="Ask Prime AI anything..."
+                                        placeholder={isListening ? "Listening..." : "Ask Prime AI anything..."}
                                         className="flex-grow bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none"
                                     />
-                                    <button
-                                        onClick={handleSend}
-                                        className="w-12 h-12 bg-blue-600 hover:bg-blue-500 rounded-2xl flex items-center justify-center text-white transition-all shadow-lg shadow-blue-900/40 active:scale-95 group"
-                                    >
-                                        <Send size={20} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                                    </button>
+                                    <div className="flex items-center gap-2 pr-2">
+                                        <button
+                                            type="button"
+                                            onClick={startListening}
+                                            className={`p-3 rounded-xl transition-all ${isListening ? 'bg-red-500/20 text-red-500 animate-pulse' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                                            title="Voice Search"
+                                        >
+                                            {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+                                        </button>
+                                        <button
+                                            onClick={handleSend}
+                                            className="w-12 h-12 bg-blue-600 hover:bg-blue-500 rounded-2xl flex items-center justify-center text-white transition-all shadow-lg shadow-blue-900/40 active:scale-95 group"
+                                        >
+                                            <Send size={20} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div className="mt-4 flex items-center justify-center gap-2 text-[9px] text-white/10 font-bold uppercase tracking-[0.3em]">
