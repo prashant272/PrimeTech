@@ -144,13 +144,6 @@ const ITFooter = () => {
                                 <p className="text-white text-sm leading-relaxed mb-4 font-medium">
                                     Near Lucky Roundabout, 3912, Ajman, U.A.E.
                                 </p>
-                                <div className="flex gap-4 items-center">
-                                    <Phone size={14} className="text-emerald-400 opacity-60" />
-                                    <div className="flex flex-col text-[13px] text-white font-bold">
-                                        <span>+971 6 742 5385</span>
-                                        <span>+971 58 512 2033</span>
-                                    </div>
-                                </div>
                             </motion.div>
                         </div>
                     </div>

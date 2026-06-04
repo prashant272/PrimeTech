@@ -183,9 +183,17 @@ const ChatBot = () => {
 
     const isFuzzyMatch = (input, target) => {
         if (!input || !target) return false;
-        const a = input.toLowerCase();
-        const b = target.toLowerCase();
-        if (a.includes(b) || b.includes(a)) return true;
+        const a = input.toLowerCase().trim();
+        const b = target.toLowerCase().trim();
+
+        // If exact match
+        if (a === b) return true;
+
+        // Prevent short keywords from matching substrings (e.g. 'hi' matching 'hiring')
+        if (b.length <= 3) {
+            const words = a.split(/[^a-zA-Z0-9]+/).filter(w => w.length > 0);
+            return words.includes(b);
+        }
 
         const getLevenshteinDistance = (s1, s2) => {
             const costs = [];
@@ -208,7 +216,7 @@ const ChatBot = () => {
 
         const dist = getLevenshteinDistance(a, b);
         const maxLen = Math.max(a.length, b.length);
-        return (1 - (dist / maxLen)) >= 0.7; // 70% threshold
+        return (1 - (dist / maxLen)) >= 0.9; // 90% threshold
     };
 
     const finishResponse = (response) => {
@@ -278,7 +286,7 @@ const ChatBot = () => {
                 botResponse = "We don't have open vacancies right now, but you can leave your details. Type 'Start' to register.";
             }
         }
-        // 3. Admin Rules
+        // 3. Local High-Confidence Rules (90% match)
         else {
             const matchedRule = config?.rules?.find(rule => {
                 const keywords = rule.keyword.split(',').map(k => k.trim());
@@ -292,14 +300,8 @@ const ChatBot = () => {
                 } else {
                     botResponse = matchedRule.value;
                 }
-            } else if (hasSynonym('services')) {
-                botResponse = websiteContext.services + " Want a consultation? Type 'Start'.";
-            } else if (hasSynonym('about')) {
-                botResponse = websiteContext.about;
-            } else if (hasSynonym('visa')) {
-                botResponse = websiteContext.visa;
             } else {
-                // 4. Gemini AI Fallback
+                // 4. Backend Gemini AI
                 try {
                     const aiRes = await api.post('/ai/chat', {
                         query: userInput,
